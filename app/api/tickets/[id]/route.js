@@ -2,12 +2,12 @@ import { Ticket } from '../../../../lib/models.js';
 import { withConversation, conversationKey } from '../../../../lib/conversations.js';
 import mongoose from 'mongoose';
 import { connectDB } from '../../../../lib/db.js';
-import { authorize } from '../../../../lib/auth.js';
+import { authorize, sameOrigin } from '../../../../lib/auth.js';
 import { saveAndNotify } from '../../../../lib/status-update.js';
 export const runtime = 'nodejs';
 export async function PATCH(request, { params }) {
   const denied = authorize(request); if (denied) return denied;
-  if (!process.env.APP_ORIGIN || request.headers.get('origin') !== process.env.APP_ORIGIN)
+  if (!sameOrigin(request))
     return Response.json({ error: 'Invalid origin' }, { status: 403 });
   const { id } = await params;
   if (!mongoose.isObjectIdOrHexString(id)) return Response.json({ error: 'Invalid ID' }, { status: 400 });

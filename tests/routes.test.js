@@ -1,3 +1,4 @@
+import {createSession} from '../lib/auth.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
@@ -14,7 +15,7 @@ function signed(body, valid = true) {
   return new Request('http://localhost/api/webhook/line', { method: 'POST', body,
     headers: { 'x-line-signature': valid ? createHmac('sha256', secret).update(body).digest('base64') : 'bad' } });
 }
-const authorization = 'Basic ' + Buffer.from('staff-test:test-password').toString('base64');
+const cookie = 'ticket_session='+createSession();
 test('webhook rejects invalid signature', async () => {
   assert.equal((await POST(signed('{"events":[]}', false))).status, 401);
 });
@@ -32,14 +33,14 @@ test('ticket API denies unauthenticated requests', async () => {
   assert.equal((await GET(new Request('https://test.example/api/tickets'))).status, 401);
 });
 test('ticket API validates pagination before querying', async () => {
-  assert.equal((await GET(new Request('https://test.example/api/tickets?page=-1', { headers: { authorization } }))).status, 400);
+  assert.equal((await GET(new Request('https://test.example/api/tickets?page=-1', { headers: { cookie } }))).status, 400);
 });
 test('status update rejects cross-site request', async () => {
-  const req = new Request('https://test.example/api/tickets/123', { method: 'PATCH', headers: { authorization, origin: 'https://other.example' }, body: '{"status":"Resolved"}' });
+  const req = new Request('https://test.example/api/tickets/123', { method: 'PATCH', headers: { cookie, origin: 'https://other.example' }, body: '{"status":"Resolved"}' });
   assert.equal((await PATCH(req, { params: Promise.resolve({ id: '123' }) })).status, 403);
 });
 test('status update validates enum', async () => {
-  const req = new Request('https://test.example/api/tickets/123', { method: 'PATCH', headers: { authorization, origin: 'https://test.example' }, body: '{"status":"Admin"}' });
+  const req = new Request('https://test.example/api/tickets/123', { method: 'PATCH', headers: { cookie, origin: 'https://test.example' }, body: '{"status":"Admin"}' });
   assert.equal((await PATCH(req, { params: Promise.resolve({ id: '507f1f77bcf86cd799439011' }) })).status, 400);
 });
 

@@ -1,4 +1,5 @@
 'use client';
+import LogoutButton from '../LogoutButton.jsx';
 
 import GuideImages, { imageUrl, readGuideImage } from './GuideImages.jsx';
 import { useEffect, useState } from 'react';
@@ -116,7 +117,7 @@ export default function GuideLibrary() {
         <a href="/guides" aria-current="page">
           คู่มือการแก้ปัญหา
         </a>
-      </nav>
+      <LogoutButton/></nav>
       <header>
         <div>
           <span className="eyebrow">คู่มือภายในทีม</span>

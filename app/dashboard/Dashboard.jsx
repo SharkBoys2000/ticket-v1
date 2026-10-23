@@ -1,4 +1,5 @@
 'use client';
+import LogoutButton from '../LogoutButton.jsx';
 
 import AssigneeEditor from './AssigneeEditor.jsx';
 import Analytics from './Analytics.jsx';
@@ -142,7 +143,7 @@ export default function Dashboard({
           คำร้องและรายงาน
         </a>
         <a href="/guides">คู่มือการแก้ปัญหา</a>
-      </nav>
+      <LogoutButton/></nav>
       <header>
         <div>
           <span className="eyebrow">LINE OFFICIAL ACCOUNT / SUPPORT</span>
